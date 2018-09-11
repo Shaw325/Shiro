@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shaw.dao.StockMapper">
+
+
+	<update id="updateStockById" parameterType="Stock">
+		update stock set sale=sale + 1,version = version + 1 where id=#{id} AND version = #{version}
+	</update>
+
+	<select id="getStockByID" resultType="com.shaw.pojo.Stock" parameterType="int">
+		SELECT * FROM stock WHERE id=#{sid}
+	</select>
+</mapper>

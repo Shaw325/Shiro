@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+</head>
+<script src="/static/js/jquery-3.3.1.js"></script>
+<body>
+<form>
+    用户名:<input type="text" name="name"/><br>
+    密码:<input type="text" name="password"/><br>
+    <input type="button" value="提交"/>
+</form>
+</body>
+<script>
+    $("input:button").click(function () {
+        $.ajax({
+            url: "/enter",
+            type: "post",
+            data: $("form").serialize(),
+            success: function (result) {
+                if(result.status=='SUCCESS'){
+                    window.location.href='/success';
+                }else{
+                    alert("重新登录");
+                }
+            }
+        });
+    });
+</script>
+</html>

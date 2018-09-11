@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd
+                            http://www.springframework.org/schema/aop
+                            http://www.springframework.org/schema/aop/spring-aop.xsd
+							 http://www.springframework.org/schema/tx
+							http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="com.shaw"></context:component-scan>
+
+
+	<!-- <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		 <property name="securityManager" ref="webSecurityManager"/>
+		 <property name="loginUrl" value="toPage"/>
+		 <property name="unauthorizedUrl" value="toPage"/>
+		 <property name="filterChainDefinitions">
+		 </property>
+	 </bean>-->
+
+	<!--<bean id="webSecurityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">-->
+	<!--<property name="realm" ref="shiroRealm"/>-->
+	<!--</bean>-->
+
+	<context:property-placeholder location="classpath:jdbc.properties"/>
+
+	<!--MySQL数据源-->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="driverClassName" value="${jdbc.mysql.driver}"/>
+		<property name="url" value="${jdbc.mysql.url}"/>
+		<property name="username" value="${jdbc.mysql.username}"/>
+		<property name="password" value="${jdbc.mysql.password}"/>
+		<property name="initialSize" value="${jdbc.initialSize}"/>
+		<property name="minIdle" value="${jdbc.minIdle}"/>
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<property name="maxWait" value="${jdbc.maxWait}"/>
+		<property name="defaultAutoCommit" value="${jdbc.defaultAutoCommit}"/>
+		<property name="removeAbandoned" value="${jdbc.removeAbandoned}"/>
+		<property name="removeAbandonedTimeoutMillis" value="${jdbc.removeAbandonedTimeout}"/>
+		<property name="testWhileIdle" value="${jdbc.testWhileIdle}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"/>
+		<property name="numTestsPerEvictionRun" value="${jdbc.numTestsPerEvictionRun}"/>
+		<property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"/>
+		<property name="filters" value="stat" />
+	</bean>
+
+	<!--Oracle数据源-->
+	<bean id="dataSource2" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="driverClassName" value="${jdbc.oracle.driver}"/>
+		<property name="url" value="${jdbc.oracle.url}"/>
+		<property name="username" value="${jdbc.oracle.username}"/>
+		<property name="password" value="${jdbc.oracle.password}"/>
+		<property name="initialSize" value="${jdbc.initialSize}"/>
+		<property name="minIdle" value="${jdbc.minIdle}"/>
+		<property name="maxActive" value="${jdbc.maxActive}"/>
+		<property name="maxWait" value="${jdbc.maxWait}"/>
+		<property name="defaultAutoCommit" value="${jdbc.defaultAutoCommit}"/>
+		<property name="removeAbandoned" value="${jdbc.removeAbandoned}"/>
+		<property name="removeAbandonedTimeoutMillis" value="${jdbc.removeAbandonedTimeout}"/>
+		<property name="testWhileIdle" value="${jdbc.testWhileIdle}"/>
+		<property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}"/>
+		<property name="numTestsPerEvictionRun" value="${jdbc.numTestsPerEvictionRun}"/>
+		<property name="minEvictableIdleTimeMillis" value="${jdbc.minEvictableIdleTimeMillis}"/>
+		<property name="filters" value="stat" />
+	</bean>
+
+	<!--多数据源切换-->
+	<bean id="multipartDataSource" class="com.shaw.util.MutlipleDataSource">
+		<property name="defaultTargetDataSource" ref="dataSource"/>
+		<property name="targetDataSources">
+			<map>
+				<entry key="OracleDataSource" value-ref="dataSource2"/>
+				<entry key="MySQLDataSource" value-ref="dataSource"/>
+			</map>
+		</property>
+
+	</bean>
+
+	<!--mybatis整合spring核心配置-->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="multipartDataSource"/>
+		<property name="configLocation" value="classpath:mybatis.cxf.xml"/>
+		<property name="mapperLocations" value="classpath:mapper/*.xml"/>
+	</bean>
+
+	<!--自动根据接口映射实体类-->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.shaw.dao"/>
+	</bean>
+
+	<!--开启自动动态代理-->
+	<aop:aspectj-autoproxy/>
+
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="multipartDataSource"/>
+	</bean>
+
+	<tx:annotation-driven transaction-manager="transactionManager"/>
+
+	<!--&lt;!&ndash; 配置druid监控spring jdbc &ndash;&gt;-->
+	<!--<bean id="druid-stat-interceptor" class="com.alibaba.druid.support.spring.stat.DruidStatInterceptor" />-->
+
+	<!--<bean id="druid-stat-pointcut" class="org.springframework.aop.support.JdkRegexpMethodPointcut" scope="prototype">-->
+		<!--<property name="patterns">-->
+			<!--<list>-->
+				<!--<value>com.shaw.service.Impl.UserServiceImpl.*</value>-->
+			<!--</list>-->
+		<!--</property>-->
+	<!--</bean>-->
+
+	<!--<aop:config proxy-target-class="true">-->
+		<!--<aop:advisor advice-ref="druid-stat-interceptor" pointcut-ref="druid-stat-pointcut" />-->
+	<!--</aop:config>-->
+</beans>

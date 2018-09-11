@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                            http://www.springframework.org/schema/context
+                            http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:component-scan base-package="com.shaw"></context:component-scan>
+
+
+	<!--最重要的核心过滤器-->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager"/>
+		<property name="loginUrl" value="/"/>
+		<property name="unauthorizedUrl" value="/"/>
+		<property name="successUrl" value="/success"/>
+		<property name="filterChainDefinitions">
+			<value>
+				/toPage = anon
+				/enter = anon
+				<!--不拦截静态资源-->
+				/static/** = anon
+				/** = authc
+				<!--/** = anon-->
+			</value>
+		</property>
+	</bean>
+
+
+	<!--shiro核心管理器-->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="realm"/>
+		<property name="rememberMeManager" ref="cookieRememberMe"/>
+
+	</bean>
+
+	<!--md5加密-->
+	<bean id="matcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+		<property name="hashAlgorithmName" value="md5"/>
+		<property name="hashIterations" value="1"/>
+	</bean>
+
+	<!--角色认证-->
+	<bean id="realm" class="com.shaw.realm.ShiroRealm">
+		<property name="credentialsMatcher" ref="matcher"/>
+	</bean>
+
+	<!--cookie记住用户-->
+	<bean id="cookieRememberMe" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+		<property name="cookie" ref="cookie"></property>
+	</bean>
+
+	<bean id="cookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+		<constructor-arg value="rememberMe"></constructor-arg>
+		<property name="maxAge" value="960000"></property>
+		<property name="httpOnly" value="true"/>
+	</bean>
+
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC
+		"-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shaw.dao.UserDao">
+
+	<sql id="USER_COLUMN">
+		<trim suffixOverrides=",">
+			${name}.user_id as id,
+			${name}.username as name,
+			${name}.password as password,
+		</trim>
+	</sql>
+	
+	<sql id="USER_WHERE">
+		<if test="user!=null">
+			<where>
+				<if test="user.name!=null">
+					and name=#{user.name}
+				</if>
+				<if test="user.password!=null">
+					and name=#{user.password}
+				</if>
+			</where>
+		</if>
+	</sql>
+
+	<select id="getUser" resultType="user" parameterType="string">
+		SELECT
+		<include refid="USER_COLUMN">
+			<property name="name" value="a"/>
+		</include>
+		from shiro_user a
+		<where>
+			<if test="name!=null">
+				a.username=#{name}
+			</if>
+		</where>
+	</select>
+
+	
+	<select id="getList" resultType="com.shaw.pojo.User">
+		SELECT
+		<include refid="USER_COLUMN">
+			<property name="name" value="a"></property>
+		</include>
+		FROM shiro_user a
+	</select>
+
+
+	<select id="getUserWithLogin" resultType="com.shaw.pojo.User">
+		select
+		<include refid="USER_COLUMN">
+			<property name="name" value="a"/>
+		</include>
+		from shiro_user a
+		<include refid="USER_WHERE"/>
+	</select>
+</mapper>
