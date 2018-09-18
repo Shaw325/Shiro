@@ -20,7 +20,6 @@
 			<value>
 				/toPage = anon
 				/enter = anon
-				<!--不拦截静态资源-->
 				/static/** = anon
 				/** = authc
 				<!--/** = anon-->
