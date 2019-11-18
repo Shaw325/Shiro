@@ -13,7 +13,7 @@
     <module>Shiro-WEB</module>
     <module>Test-WEB</module>
     <module>Druid-Monitor</module>
-	  <module>seconds-kill</module>
+    <module>seconds-kill</module>
   </modules>
 
   <properties>
